@@ -4,6 +4,6 @@
     <title>Home</title>
 </head>
 <body>
-    <h1>Selamat Datang di Website Point of Sales</h1>
+    <h1>Welcome to Point of Sales Website</h1>
 </body>
 </html>
