@@ -8,6 +8,6 @@ class UserController extends Controller
 {
     public function show($id, $name) // menerima 2 parameter
     {
-        return view('user.profile', compact('id', 'name')); // mengirim variable id dan name ke dalam view
+        return view('user', compact('id', 'name')); // mengirim variable id dan name ke dalam view
     }
 }
