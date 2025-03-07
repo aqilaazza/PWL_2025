@@ -10,27 +10,49 @@ class UserController extends Controller
 {
     public function index()
     {
-        $user = UserModel::create([
-            'username' => 'manager11',
-            'nama' => 'Manager11',
-            'password' => Hash::make('12345'),
-            'level_id' => 2,
-            //Data berhasil disimpan ke database dengan username manager11
+        $user = UserModel::all();
+        return view('user', ['data' => $user]);
+    }
+
+    public function tambah() {
+        return view('user_tambah');
+    }
+
+    public function tambah_simpan(Request $request) {
+        UserModel::create([
+            'username' => $request->username,
+            'nama' => $request->nama,
+            'password' => Hash::make($request->password), 
+            'level_id' => $request->level_id
         ]);
 
-        $user->username = 'manager12';
-        // Sekarang ada perubahan, tetapi belum disimpan ke database.
-
-        $user->save();
-        //Perubahan username sudah tersimpan di database.
-
-        $user->wasChanged(); //true (Mengembalikan true karena ada perubahan (username))
-        $user->wasChanged('username'); //true (Mengembalikan true karena username memang berubah)
-        $user->wasChanged(['username', 'level_id']);//true (Mengembalikan true karena username berubah (meskipun level_id tidak berubah, tapi karena salah satunya berubah, hasilnya tetap true))
-        $user->wasChanged('nama');//false (Mengembalikan false karena nama tidak berubah)
-        dd($user->wasChanged(['nama', 'username']));//true (Mengembalikan true karena username berubah (meskipun nama tidak berubah, karena salah satunya berubah, hasilnya tetap true))
-
-        
+        return redirect('/user');
     }
+
+    public function ubah($id) {
+        $user = UserModel::find($id);
+        return view('user_ubah', ['data' => $user]);
+    }
+
+    public function ubah_simpan($id, Request $request) {
+        $user = UserModel::find($id);
+    
+        $user->username = $request->username;
+        $user->nama = $request->nama;
+        $user->password = Hash::make('$request->password');
+        $user->level_id = $request->level_id;
+    
+        $user->save();
+    
+        return redirect('/user');
+    }
+    
+    public function hapus($id) {
+        $user = UserModel::find($id);  // Mencari user berdasarkan ID
+        $user->delete();               // Menghapus user dari database
+
+        return redirect('/user');       // Redirect kembali ke halaman daftar user
+    }
+
 }
 
