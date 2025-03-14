@@ -15,6 +15,7 @@ class KategoriSeeder extends Seeder
             ['kategori_id' => 3, 'kategori_kode' => 'HC', 'kategori_nama' => 'Home Care'],
             ['kategori_id' => 4, 'kategori_kode' => 'BK', 'kategori_nama' => 'Baby & Kids'],
             ['kategori_id' => 5, 'kategori_kode' => 'EL', 'kategori_nama' => 'Electronics'],
+            
         ];
 
         DB::table('m_kategori')->insert($data);
