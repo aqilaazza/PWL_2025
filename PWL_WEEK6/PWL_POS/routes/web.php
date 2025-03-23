@@ -100,9 +100,18 @@ Route::group(['prefix' => 'barang'], function () {
     Route::post('/list', [BarangController::class, 'list']);
     Route::get('/create', [BarangController::class, 'create']);
     Route::post('/', [BarangController::class, 'store']);
+     // Create menggunakan AJAX
+     Route::get('/create_ajax', [BarangController::class, 'create_ajax']); // menampilkan halaman form tambah Barang ajax
+     Route::post('/ajax', [BarangController::class, 'store_ajax']); // menyimpan data Barang baru ajax
     Route::get('/{id}', [BarangController::class, 'show']);
     Route::get('/{id}/edit', [BarangController::class, 'edit']);
     Route::put('/{id}', [BarangController::class, 'update']);
+    // Edit menggunakan AJAX
+    Route::get('/{id}/edit_ajax', [BarangController::class, 'edit_ajax']); // menampilkan halaman form edit Barang ajax
+    Route::put('/{id}/update_ajax', [BarangController::class, 'update_ajax']); // menyimpan perubahan data Barang ajax
+    // Delete menggunakan AJAX
+    Route::get('/{id}/delete_ajax', [BarangController::class, 'confirm_ajax']); //menampilkan form confirm delete Barang ajax
+    Route::delete('/{id}/delete_ajax', [BarangController::class, 'delete_ajax']); // menghapus data Barang ajax
     Route::delete('/{id}', [BarangController::class, 'destroy']);
 });
 
