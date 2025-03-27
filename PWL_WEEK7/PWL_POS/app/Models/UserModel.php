@@ -26,7 +26,7 @@ class UserModel extends Authenticatable
         return $this->belongsTo(LevelModel::class, 'level_id', 'level_id');
     }
 
-    /**
+   /**
      * Mendapatkan nama role
      */
     public function getRoleName(): string
@@ -41,6 +41,15 @@ class UserModel extends Authenticatable
     {
         return $this->level->level_kode == $role;
     }
+
+    /**
+     * Mendapatkan kode role
+     */
+    public function getRole()
+    {
+        return $this->level->level_kode;
+    }
+
 
 
 }
