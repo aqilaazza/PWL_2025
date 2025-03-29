@@ -7,7 +7,7 @@
         <div class="card-tools">
             <button onclick="modalAction('{{ url('/user/import') }}')" class="btn btn-info">Import Pengguna</button>
             <a href="{{ url('/user/create') }}" class="btn btn-primary">Tambah Data</a>
-            <button onclick="modalAction('{{ url('/user/create_ajax') }}')" class="btn btn-success">Tambah Pengguna (Ajax)</button>
+            <button onclick="modalAction('{{ url('/user/create_ajax') }}')" class="btn btn-success">Tambah Data (Ajax)</button>
         </div>
     </div>
     <div class="card-body">
