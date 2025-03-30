@@ -2,12 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UserModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function show($id, $name) // menerima 2 parameter
+    public function index()
     {
-        return view('user', compact('id', 'name')); // mengirim variable id dan name ke dalam view
+        // tambah data user dengan Eloquent Model
+        $data = [
+            'nama' => 'Pelanggan Pertama',
+        ];
+        
+        UserModel::where('username', 'customer-1')->update($data); // update data user
+
+        // coba akses model UserModel
+        $user = UserModel::all(); // ambil semua data dari tabel m_user
+        return view('user', ['data' => $user]);
     }
 }
+
