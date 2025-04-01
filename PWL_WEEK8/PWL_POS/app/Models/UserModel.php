@@ -12,7 +12,7 @@ class UserModel extends Authenticatable
 
     protected $table = 'm_user';
     protected $primaryKey = 'user_id';
-    protected $fillable = ['username', 'password', 'nama', 'level_id', 'created_at', 'updated_at'];
+    protected $fillable = ['level_id', 'username', 'avatar', 'nama', 'password', 'created_at', 'updated_at'];
 
     protected $hidden = ['password']; // jangan di tampilkan saat select
 
@@ -50,6 +50,11 @@ class UserModel extends Authenticatable
         return $this->level->level_kode;
     }
 
-
-
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->avatar) {
+            return asset($this->avatar); // Langsung dari public
+        }
+        return asset('images/default-avatar.png');
+    }
 }
