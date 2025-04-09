@@ -45,7 +45,6 @@
             <thead>
                 <tr>
                     <th>No</th>
-                    <th>ID Pengguna</th>
                     <th>Username</th>
                     <th>Nama</th>
                     <th>Level</th>
@@ -89,13 +88,6 @@
                     width: "5%",
                     orderable: false,
                     searchable: false
-                },
-                {
-                    data: "user_id",
-                    className: "",
-                    width: "15%",
-                    orderable: true,
-                    searchable: true
                 },
                 {
                     data: "username",
