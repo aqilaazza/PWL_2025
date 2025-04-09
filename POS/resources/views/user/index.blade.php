@@ -18,7 +18,7 @@
                     <div class="form-group form-group-sm row text-sm mb-0">
                         <label for="filter_level" class="col-md-1 col-form-label">Filter</label>
                         <div class="col-md-3">
-                            <select name="filter_level" class="form-control form-control-sm filter_level">
+                            <select name="level_id" class="form-control form-control-sm filter_level">
                                 <option value="">- Semua -</option>
                                 @foreach($level as $l)
                                     <option value="{{ $l->level_id }}">{{ $l->level_nama }}</option>
@@ -78,7 +78,7 @@
                 "dataType": "json",
                 "type": "POST",
                 "data": function (d) {
-                    d.filter_level = $('.filter_level').val();
+                    d.level_id = $('.filter_level').val();
                 }
             },
             columns: [
