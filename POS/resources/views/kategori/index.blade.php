@@ -27,7 +27,7 @@
                         <div class="form-group form-group-sm row text-sm mb-0">
                             <label for="filter_kategori" class="col-md-1 col-form-label">Filter</label>
                             <div class="col-md-3">
-                                <select name="filter_kategori" class="form-control form-control-sm filter_kategori">
+                                <select name="kategori_id" class="form-control form-control-sm filter_kategori">
                                     <option value="">- Semua -</option>
                                     @foreach($kategori as $l)
                                         <option value="{{ $l->kategori_id }}">{{ $l->kategori_nama }}</option>
@@ -72,7 +72,7 @@
                     "dataType": "json",
                     "type": "POST",
                     "data": function (d) {
-                        d.filter_kategori = $('.filter_kategori').val();
+                        d.kategori_id = $('.filter_kategori').val();
                     }
                 },
                 columns: [
