@@ -201,8 +201,15 @@ Route::middleware(['auth'])->group(function () {
              Route::get('/{id}/edit_ajax', [StokController::class, 'edit_ajax']); // menampilkan halaman form edit Stok ajax
              Route::put('/{id}/update_ajax', [StokController::class, 'update_ajax']); // menyimpan perubahan data Stok ajax
               // Delete menggunakan AJAX
-              Route::get('/{id}/delete_ajax', [StokController::class, 'confirm_ajax']); //menampilkan form confirm delete Stok ajax
-              Route::delete('/{id}/delete_ajax', [StokController::class, 'delete_ajax']); // menghapus data Stok ajax
+            Route::get('/{id}/delete_ajax', [StokController::class, 'confirm_ajax']); //menampilkan form confirm delete Stok ajax
+            Route::delete('/{id}/delete_ajax', [StokController::class, 'delete_ajax']); // menghapus data Stok ajax
+            // Import Supplier with Excel
+            Route::get('import', [StokController::class, 'import']); // ajax form upload excel
+            Route::post('import_ajax', [StokController::class, 'import_ajax']); // ajax import excel
+            // Export Supplier with Excel
+            Route::get('export_excel', [StokController::class, 'export_excel']); //export excel
+            // Export Supplier with Pdf
+            Route::get('export_pdf', [StokController::class, 'export_pdf']); //export pdf
         });
     });
 });

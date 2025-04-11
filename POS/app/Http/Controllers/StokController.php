@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\StokModel;
 use App\Models\BarangModel;
 use App\Models\UserModel;
-use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class StokController extends Controller
 {
@@ -227,4 +231,132 @@ class StokController extends Controller
         }
         return redirect('/');
     }
+
+     // Import Xlxs
+     public function import()
+     {
+         return view('stok.import');
+     }
+ 
+     // Impor AJAX
+     public function import_ajax(Request $request)
+     {
+         if ($request->ajax() || $request->wantsJson()) {
+             $rules = [
+                 'file_stok' => ['required', 'mimes:xlsx', 'max:1024']
+             ];
+ 
+             $validator = Validator::make($request->all(), $rules);
+             if ($validator->fails()) {
+                 return response()->json([
+                     'status' => false,
+                     'message' => 'Validasi Gagal',
+                     'msgField' => $validator->errors()
+                 ]);
+             }
+ 
+             $file = $request->file('file_stok');
+             $reader = IOFactory::createReader('Xlsx');
+             $reader->setReadDataOnly(true);
+             $spreadsheet = $reader->load($file->getRealPath());
+             $sheet = $spreadsheet->getActiveSheet();
+             $data = $sheet->toArray(null, false, true, true);
+ 
+             $insert = [];
+             if (count($data) > 1) {
+                 foreach ($data as $baris => $value) {
+                     if ($baris > 1) {
+                         $insert[] = [
+                             'barang_id' => $value['A'],
+                             'user_id' => $value['B'],
+                             'stok_jumlah' => $value['C'],
+                             'stok_tanggal' => now(),
+                             'created_at' => now(),
+                         ];
+                     }
+                 }
+ 
+                 if (count($insert) > 0) {
+                     StokModel::insertOrIgnore($insert);
+                     return response()->json([
+                         'status' => true,
+                         'message' => 'Data berhasil diimport'
+                     ]);
+                 }
+             }
+ 
+             return response()->json([
+                 'status' => false,
+                 'message' => 'Tidak ada data yang diimport'
+             ]);
+         }
+         return redirect('/');
+     }
+ 
+     // Ekspor Xlxs
+     public function export_excel()
+     {
+         $stoks = StokModel::select('stok_id', 'barang_id', 'user_id', 'stok_jumlah', 'stok_tanggal')
+             ->with(['barang', 'user'])
+             ->orderBy('stok_id')
+             ->get();
+ 
+         $spreadsheet = new Spreadsheet();
+         $sheet = $spreadsheet->getActiveSheet();
+ 
+         $sheet->setCellValue('A1', 'No');
+         $sheet->setCellValue('B1', 'ID Stok');
+         $sheet->setCellValue('C1', 'Kode Barang');
+         $sheet->setCellValue('D1', 'Nama Barang');
+         $sheet->setCellValue('E1', 'Petugas Update');
+         $sheet->setCellValue('F1', 'Jumlah Stok');
+         $sheet->setCellValue('G1', 'Tanggal Stok');
+ 
+         $sheet->getStyle('A1:G1')->getFont()->setBold(true);
+ 
+         $no = 1;
+         $baris = 2;
+         foreach ($stoks as $stok) {
+             $sheet->setCellValue('A' . $baris, $no);
+             $sheet->setCellValue('B' . $baris, $stok->stok_id);
+             $sheet->setCellValue('C' . $baris, $stok->barang ? $stok->barang->barang_kode : '-');
+             $sheet->setCellValue('D' . $baris, $stok->barang ? $stok->barang->barang_nama : '-');
+             $sheet->setCellValue('E' . $baris, $stok->user ? $stok->user->nama : '-');
+             $sheet->setCellValue('F' . $baris, $stok->stok_jumlah);
+             $sheet->setCellValue('G' . $baris, $stok->stok_tanggal);
+             $baris++;
+             $no++;
+         }
+ 
+         foreach (range('A', 'G') as $columnID) {
+             $sheet->getColumnDimension($columnID)->setAutoSize(true);
+         }
+ 
+         $sheet->setTitle('Data Stok');
+ 
+         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+         $filename = 'Data_Stok_' . date('Y-m-d_H-i-s') . '.xlsx';
+ 
+         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+         header('Content-Disposition: attachment;filename="' . $filename . '"');
+         header('Cache-Control: max-age=0');
+         $writer->save('php://output');
+         exit;
+     }
+ 
+     // Ekspor ke PDF
+     public function export_pdf()
+     {
+         $stok = StokModel::select('stok_id', 'barang_id', 'user_id', 'stok_jumlah', 'stok_tanggal')
+             ->with(['barang', 'user'])
+             ->orderBy('stok_id')
+             ->get();
+ 
+         $pdf = Pdf::loadView('stok.export_pdf', ['stok' => $stok]);
+         $pdf->setPaper('a4', 'portrait');
+         $pdf->setOption("isRemoteEnabled", true);
+         $pdf->render();
+ 
+         return $pdf->stream('Data_Stok_' . date('Y-m-d_H-i-s') . '.pdf');
+     }
 }
