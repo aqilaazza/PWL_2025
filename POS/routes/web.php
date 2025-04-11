@@ -6,6 +6,7 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\WelcomeController;
+use App\Http\Controllers\StokController;
 use App\Http\Controllers\AuthController;
 use App\Models\SupplierModel;
 use Illuminate\Support\Facades\Route;
@@ -184,6 +185,24 @@ Route::middleware(['auth'])->group(function () {
             Route::get('export_excel', [SupplierController::class, 'export_excel']); //export excel
             // Export Supplier with Pdf
             Route::get('export_pdf', [SupplierController::class, 'export_pdf']); //export pdf
+        });
+    });
+
+    // artinya semua route di dalam group ini harus punya role ADM (Administrator), MNG (Manager) dan STF (Staff)
+    Route::middleware(['authorize:ADM,MNG,STF'])->group(function(){
+        Route::group(['prefix' => 'stok'], function () {
+            Route::get('/', [StokController::class, 'index']);
+            Route::post('/list', [StokController::class, 'list']); // menampilkan data stok dalam bentuk json untuk datatables
+            Route::get('/{id}', [StokController::class, 'show']); // Menampilkan detail barang
+             // Create menggunakan AJAX
+             Route::get('/create_ajax', [StokController::class, 'create_ajax']); // menampilkan halaman form tambah Stok ajax
+             Route::post('/ajax', [StokController::class, 'store_ajax']); // menyimpan data Stok baru ajax
+             // Edit menggunakan AJAX
+             Route::get('/{id}/edit_ajax', [StokController::class, 'edit_ajax']); // menampilkan halaman form edit Stok ajax
+             Route::put('/{id}/update_ajax', [StokController::class, 'update_ajax']); // menyimpan perubahan data Stok ajax
+              // Delete menggunakan AJAX
+              Route::get('/{id}/delete_ajax', [StokController::class, 'confirm_ajax']); //menampilkan form confirm delete Stok ajax
+              Route::delete('/{id}/delete_ajax', [StokController::class, 'delete_ajax']); // menghapus data Stok ajax
         });
     });
 });
