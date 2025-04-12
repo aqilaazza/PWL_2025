@@ -70,6 +70,8 @@ Route::middleware(['auth'])->group(function () {
             //Create Menggunakan AJAX
             Route::get('/create_ajax', [LevelController::class, 'create_ajax']); // Menampilkan halaman form tambah level Ajax
             Route::post('/ajax', [LevelController::class, 'store_ajax']); // Menyimpan data level baru Ajax
+            //Show Menggunakan AJAX
+            Route::get('/{id}/show_ajax', [LevelController::class, 'show_ajax']); // Menampilkan detail level Ajax
             Route::get('/{id}', [LevelController::class, 'show']); // menampilkan detail level
             Route::get('/{id}/edit', [LevelController::class, 'edit']); // menampilkan halaman form edit level
             Route::put('/{id}', [LevelController::class, 'update']); // menyimpan perubahan data level
