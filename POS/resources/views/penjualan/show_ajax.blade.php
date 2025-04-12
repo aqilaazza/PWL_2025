@@ -19,6 +19,7 @@
         </div>
         <div class="modal-body">
             <table class="table table-bordered table-sm">
+                <tr><th>ID Penjualan</th><td>{{ $penjualan->penjualan_id}}</td></tr>
                 <tr><th width="30%">Kode</th><td>{{ $penjualan->penjualan_kode }}</td></tr>
                 <tr><th>Petugas</th><td>{{ $penjualan->user->nama ?? '-' }}</td></tr>
                 <tr><th>Pembeli</th><td>{{ $penjualan->pembeli }}</td></tr>
