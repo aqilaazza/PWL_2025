@@ -132,6 +132,8 @@ Route::middleware(['auth'])->group(function () {
         Route::group(['prefix' => 'barang'], function () {
             Route::get('/', [BarangController::class, 'index']); // Menampilkan daftar barang
             Route::post('/list', [BarangController::class, 'list']); // Menampilkan data barang dalam bentuk JSON untuk datatables
+            //Show Menggunakan AJAX
+            Route::get('/{id}/show_ajax', [BarangController::class, 'show_ajax']); // Menampilkan detail barang Ajax
             Route::get('/{id}', [BarangController::class, 'show']); // Menampilkan detail barang
         });
     });
