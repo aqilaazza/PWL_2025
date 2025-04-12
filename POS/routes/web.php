@@ -104,6 +104,8 @@ Route::middleware(['auth'])->group(function () {
             // Create menggunakan AJAX
             Route::get('/create_ajax', [KategoriController::class, 'create_ajax']); // menampilkan halaman form tambah kategori ajax
             Route::post('/ajax', [KategoriController::class, 'store_ajax']); // menyimpan data kategori baru ajax
+            //Show Menggunakan AJAX
+            Route::get('/{id}/show_ajax', [KategoriController::class, 'show_ajax']); // Menampilkan detail kategori Ajax
             Route::get('/{id}', [KategoriController::class, 'show']); // menampilkan detail kategori
             Route::get('/{id}/edit', [KategoriController::class, 'edit']); // menampilkan halaman form edit kategori
             Route::put('/{id}', [KategoriController::class, 'update']); // menyimpan perubahan data kategori
