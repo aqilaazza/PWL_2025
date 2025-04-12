@@ -40,6 +40,8 @@ Route::middleware(['auth'])->group(function () {
             //Create Menggunakan AJAX
             Route::get('/create_ajax', [UserController::class, 'create_ajax']); // Menampilkan halaman form tambah user Ajax
             Route::post('/ajax', [UserController::class, 'store_ajax']); // Menyimpan data user baru Ajax
+            //Show Menggunakan AJAX
+            Route::get('/{id}/show_ajax', [UserController::class, 'show_ajax']); // Menampilkan detail user Ajax
             Route::get('/{id}', [UserController::class, 'show']); // menampilkan detail user
             Route::get('/{id}/edit', [UserController::class, 'edit']); // menampilkan halaman form edit user
             Route::put('/{id}', [UserController::class, 'update']); // menyimpan perubahan data user
