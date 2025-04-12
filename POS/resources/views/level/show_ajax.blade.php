@@ -3,7 +3,9 @@
     <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title">Kesalahan</h5>
-            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            <button type="button" class="close" data-dismiss="modal">
+                <span>&times;</span>
+            </button>
         </div>
         <div class="modal-body">
             <div class="alert alert-danger">Data tidak ditemukan.</div>
@@ -11,11 +13,13 @@
     </div>
 </div>
 @else
-<div class="modal-dialog modal-md" role="document">
+<div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title">Detail Data Level</h5>
-            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            <button type="button" class="close" data-dismiss="modal">
+                <span>&times;</span>
+            </button>
         </div>
         <div class="modal-body">
             <table class="table table-bordered table-sm">
