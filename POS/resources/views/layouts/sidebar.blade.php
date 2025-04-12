@@ -91,6 +91,13 @@
                 </a>
             </li>
 
+            <li class="nav-item">
+                <a href="{{ url('/detailPenjualan') }}" class="nav-link {{ ($activeMenu == 'detailPenjualan') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-info-circle"></i>
+                    <p>Detail Transaksi</p>
+                </a>
+            </li>
+
         </ul>
     </nav>
 </div>
