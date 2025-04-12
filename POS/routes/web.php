@@ -229,6 +229,13 @@ Route::middleware(['auth'])->group(function () {
               // Delete menggunakan AJAX
             Route::get('/{id}/delete_ajax', [PenjualanController::class, 'confirm_ajax']); //menampilkan form confirm delete penjualan ajax
             Route::delete('/{id}/delete_ajax', [PenjualanController::class, 'delete_ajax']); // menghapus data penjualan ajax
+            // Import Penjualan with Excel
+            Route::get('import', [PenjualanController::class, 'import']); // ajax form upload excel
+            Route::post('import_ajax', [PenjualanController::class, 'import_ajax']); // ajax import excel
+            // Export Penjualan with Excel
+            Route::get('export_excel', [PenjualanController::class, 'export_excel']); //export excel
+            // Export Penjualan with Pdf
+            Route::get('export_pdf', [PenjualanController::class, 'export_pdf']); //export pdf
         });
     });
 });
