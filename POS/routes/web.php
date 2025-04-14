@@ -232,15 +232,15 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', [PenjualanController::class, 'index']);
             Route::post('/list', [PenjualanController::class, 'list']); // menampilkan data penjualan dalam bentuk json untuk datatables
             Route::get('{id}/show_ajax', [PenjualanController::class, 'show_ajax']); //menampilkan detil penjualan 
-             // Create menggunakan AJAX
-             Route::get('/create_ajax', [PenjualanController::class, 'create_ajax']); // menampilkan halaman form tambah Penjualan ajax
-             Route::post('/ajax', [PenjualanController::class, 'store_ajax']); // menyimpan data Penjualan baru ajax
-             // Edit menggunakan AJAX
-             Route::get('/{id}/edit_ajax', [PenjualanController::class, 'edit_ajax']); // menampilkan halaman form edit Stok ajax
-             Route::put('/{id}/update_ajax', [PenjualanController::class, 'update_ajax']); // menyimpan perubahan data Stok ajax
-              // Delete menggunakan AJAX
-            Route::get('/{id}/delete_ajax', [PenjualanController::class, 'confirm_ajax']); //menampilkan form confirm delete penjualan ajax
-            Route::delete('/{id}/delete_ajax', [PenjualanController::class, 'delete_ajax']); // menghapus data penjualan ajax
+            // Create menggunakan AJAX
+            Route::get('/create_ajax', [PenjualanController::class, 'create_ajax'])->name('penjualan.create_ajax'); 
+            Route::post('/ajax', [PenjualanController::class, 'store_ajax'])->name('penjualan.store_ajax');      
+            // Edit menggunakan AJAX
+             Route::get('/{id}/edit_ajax', [PenjualanController::class, 'edit_ajax'])->name('penjualan.edit_ajax'); 
+             Route::post('/{id}/update_ajax', [PenjualanController::class, 'update_ajax'])->name('penjualan.update_ajax'); 
+            // Delete menggunakan AJAX
+            Route::get('/{id}/delete_ajax', [PenjualanController::class, 'confirm_ajax'])->name('penjualan.delete_ajax'); // Konfirmasi hapus penjualan via AJAX
+            Route::delete('/{id}/delete_ajax', [PenjualanController::class, 'delete_ajax'])->name('penjualan.delete_ajax_post');// menghapus data penjualan ajax
             // Import Penjualan with Excel
             Route::get('import', [PenjualanController::class, 'import']); // ajax form upload excel
             Route::post('import_ajax', [PenjualanController::class, 'import_ajax']); // ajax import excel

@@ -1,14 +1,13 @@
 @empty($penjualan)
-<div id="modal-master" class="modal-dialog modal-lg" role="document">
+<div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header bg-danger text-white">
             <h5 class="modal-title">Kesalahan</h5>
-            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
         </div>
         <div class="modal-body">
-            <div class="alert alert-danger">
-                <h5><i class="icon fas fa-ban"></i> Kesalahan!</h5>
-                Data tidak ditemukan.
+            <div class="alert alert-danger mb-0">
+                <i class="fas fa-exclamation-triangle"></i> Data penjualan tidak ditemukan.
             </div>
         </div>
     </div>
@@ -16,89 +15,157 @@
 @else
 <form action="{{ url('/penjualan/' . $penjualan->penjualan_id . '/update_ajax') }}" method="POST" id="form-edit">
     @csrf
-    @method('PUT')
-    <div id="modal-master" class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title">Edit Data Penjualan</h5>
-                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label>Kode Penjualan</label>
-                    <input value="{{ $penjualan->penjualan_kode }}" type="text" name="penjualan_kode" class="form-control">
-                    <small id="error-penjualan_kode" class="error-text text-danger"></small>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label for="penjualan_kode">Kode Penjualan</label>
+                        <input type="text" name="penjualan_kode" class="form-control" value="{{ $penjualan->penjualan_kode }}">
+                        <small id="error-penjualan_kode" class="text-danger"></small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="user_id">Petugas</label>
+                        <select name="user_id" class="form-control">
+                            <option value="">- Pilih Petugas -</option>
+                            @foreach($user as $u)
+                                <option value="{{ $u->user_id }}" {{ $u->user_id == $penjualan->user_id ? 'selected' : '' }}>
+                                    {{ $u->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <small id="error-user_id" class="text-danger"></small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="pembeli">Pembeli</label>
+                        <input type="text" name="pembeli" class="form-control" value="{{ $penjualan->pembeli }}">
+                        <small id="error-pembeli" class="text-danger"></small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="penjualan_tanggal">Tanggal Penjualan</label>
+                        <input type="date" name="penjualan_tanggal" class="form-control"
+                            value="{{ \Carbon\Carbon::parse($penjualan->penjualan_tanggal)->format('Y-m-d') }}">
+                        <small id="error-penjualan_tanggal" class="text-danger"></small>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Petugas</label>
-                    <select name="user_id" class="form-control">
-                        <option value="">- Pilih Petugas -</option>
-                        @foreach($user as $u)
-                            <option value="{{ $u->user_id }}" {{ $u->user_id == $penjualan->user_id ? 'selected' : '' }}>{{ $u->nama }}</option>
+
+                <hr>
+                <h5>Detail Barang</h5>
+                <table class="table table-sm table-bordered" id="barangTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="width: 50%;">Barang</th>
+                            <th style="width: 25%;">Jumlah</th>
+                            <th style="width: 15%;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($penjualan->details as $detail)
+                            <tr>
+                                <td>
+                                    <select name="barang_id[]" class="form-control" required>
+                                        <option value="">Pilih Barang</option>
+                                        @foreach($barangs as $barang)
+                                            <option value="{{ $barang->barang_id }}" {{ $detail->barang_id == $barang->barang_id ? 'selected' : '' }}>
+                                                {{ $barang->barang_nama }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <small class="error-barang_id text-danger"></small>
+                                </td>
+                                <td>
+                                    <input type="number" name="jumlah[]" class="form-control" min="1" value="{{ $detail->jumlah }}" required>
+                                    <small class="error-jumlah text-danger"></small>
+                                </td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-row">Hapus</button>
+                                </td>
+                            </tr>
                         @endforeach
-                    </select>
-                    <small id="error-user_id" class="error-text text-danger"></small>
-                </div>
-                <div class="form-group">
-                    <label>Pembeli</label>
-                    <input value="{{ $penjualan->pembeli }}" type="text" name="pembeli" class="form-control">
-                    <small id="error-pembeli" class="error-text text-danger"></small>
-                </div>
-                <div class="form-group">
-                    <label>Tanggal</label>
-                    <input value="{{ \Carbon\Carbon::parse($penjualan->penjualan_tanggal)->format('Y-m-d') }}" type="date" name="penjualan_tanggal" class="form-control">
-                    <small id="error-penjualan_tanggal" class="error-text text-danger"></small>
-                </div>
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-outline-success btn-sm mb-3" id="addRow">
+                    + Tambah Barang
+                </button>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-warning" data-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                 <button type="submit" class="btn btn-primary">Simpan</button>
             </div>
         </div>
     </div>
 </form>
+
 <script>
-    $(document).ready(function() {
-        $("#form-edit").validate({
-            rules: {
-                penjualan_kode: { required: true, minlength: 3 },
-                user_id: { required: true },
-                pembeli: { required: true, minlength: 3 },
-                penjualan_tanggal: { required: true, date: true }
-            },
-            submitHandler: function(form) {
-                $.ajax({
-                    url: form.action,
-                    type: form.method,
-                    data: $(form).serialize(),
-                    success: function(response) {
-                        if(response.status){
-                            $('#myModal').modal('hide');
-                            Swal.fire({ icon: 'success', title: 'Berhasil', text: response.message });
-                            tablePenjualan.ajax.reload();
-                        }else{
-                            $('.error-text').text('');
-                            $.each(response.msgField, function(prefix, val) {
-                                $('#error-'+prefix).text(val[0]);
+    $(function () {
+        // Tambah baris barang
+        $('#addRow').click(function () {
+            let row = `
+                <tr>
+                    <td>
+                        <select name="barang_id[]" class="form-control" required>
+                            <option value="">Pilih Barang</option>
+                            @foreach($barangs as $barang)
+                                <option value="{{ $barang->barang_id }}">{{ $barang->barang_nama }}</option>
+                            @endforeach
+                        </select>
+                        <small class="error-barang_id text-danger"></small>
+                    </td>
+                    <td>
+                        <input type="number" name="jumlah[]" class="form-control" min="1" required>
+                        <small class="error-jumlah text-danger"></small>
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-outline-danger btn-sm remove-row">Hapus</button>
+                    </td>
+                </tr>`;
+            $('#barangTable tbody').append(row);
+        });
+    
+        // Hapus baris
+        $(document).on('click', '.remove-row', function () {
+            $(this).closest('tr').remove();
+        });
+    
+        // Submit AJAX
+        $('#form-edit').submit(function (e) {
+            e.preventDefault();
+            let form = $(this);
+            let url = form.attr('action');
+            let data = form.serialize();
+    
+            // Reset error
+            $('.text-danger').text('');
+    
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: data,
+                success: function (res) {
+                    if (res.status) {
+                        $('#modal').modal('hide');
+                        Swal.fire('Sukses', res.message, 'success');
+                        $('#datatable').DataTable().ajax.reload(); // Jika pakai DataTable
+                    } else {
+                        Swal.fire('Gagal', res.message, 'error');
+                        if (res.msgField) {
+                            $.each(res.msgField, function (key, val) {
+                                $('#error-' + key).text(val[0]);
                             });
-                            Swal.fire({ icon: 'error', title: 'Terjadi Kesalahan', text: response.message });
                         }
                     }
-                });
-                return false;
-            },
-            errorElement: 'span',
-            errorPlacement: function(error, element) {
-                error.addClass('invalid-feedback');
-                element.closest('.form-group').append(error);
-            },
-            highlight: function(element) {
-                $(element).addClass('is-invalid');
-            },
-            unhighlight: function(element) {
-                $(element).removeClass('is-invalid');
-            }
+                },
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    Swal.fire('Error', 'Terjadi kesalahan saat memproses data', 'error');
+                }
+            });
         });
     });
 </script>
+    
 @endempty

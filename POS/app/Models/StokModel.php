@@ -28,4 +28,10 @@ class StokModel extends Model
     {
         return $this->belongsTo(UserModel::class, 'user_id');
     }
+
+    //akses pakai $stok->jumlah
+    public function getJumlahAttribute()
+    {
+        return $this->stok_jumlah;
+    }
 }
