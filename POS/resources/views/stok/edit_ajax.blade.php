@@ -60,13 +60,13 @@
                         <small id="error-stok_jumlah" class="error-text form-text text-danger"></small>
                     </div>
 
-                    {{-- Tanggal --}}
-                    <div class="form-group">
-                        <label>Tanggal Stok</label>
-                        <input type="date" name="stok_tanggal" id="stok_tanggal" class="form-control"
-                               value="{{ $stok->stok_tanggal }}" required>
-                        <small id="error-stok_tanggal" class="error-text form-text text-danger"></small>
-                    </div>
+                   {{-- Tanggal --}}
+                <div class="form-group">
+                    <label>Tanggal Stok</label>
+                    <input type="hidden" name="stok_tanggal" value="{{ $stok->stok_tanggal }}">
+                    <input type="text" class="form-control" value="{{ \Carbon\Carbon::parse($stok->stok_tanggal)->format('d-m-Y') }}" readonly>
+                </div>
+
 
                 </div>
                 <div class="modal-footer">
@@ -88,10 +88,6 @@
                         number: true,
                         min: 1
                     },
-                    stok_tanggal: {
-                        required: true,
-                        date: true
-                    }
                 },
                 submitHandler: function (form) {
                     $.ajax({
