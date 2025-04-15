@@ -16,6 +16,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Barryvdh\DomPDF\Facade\Pdf;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
+use Carbon\Carbon;
 
 class PenjualanController extends Controller
 {
@@ -316,166 +317,157 @@ public function update_ajax(Request $request, string $id)
     }
 
     public function import_ajax(Request $request)
-    {
-        if ($request->ajax() || $request->wantsJson()) {
-            $rules = [
-                'file_penjualan' => ['required', 'mimes:xlsx', 'max:1024'],
-            ];
+{
+    if ($request->ajax() || $request->wantsJson()) {
+        $rules = [
+            'file_penjualan' => ['required', 'mimes:xlsx', 'max:1024'],
+        ];
 
-            $validator = Validator::make($request->all(), $rules);
-            if ($validator->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Validasi Gagal',
-                    'msgField' => $validator->errors(),
-                ]);
-            }
-
-            try {
-                $file = $request->file('file_penjualan');
-                $reader = IOFactory::createReader('Xlsx');
-                $reader->setReadDataOnly(true);
-                $spreadsheet = $reader->load($file->getRealPath());
-                $sheet = $spreadsheet->getActiveSheet();
-                $data = $sheet->toArray(null, false, true, true);
-
-                $penjualans = [];
-                $details = [];
-                $currentPenjualanKode = null;
-
-                if (count($data) > 1) {
-                    foreach ($data as $baris => $value) {
-                        if ($baris <= 1) {
-                            continue; // Lewati header
-                        }
-
-                        if (empty($value['B']) && empty($value['E']) && empty($value['F'])) {
-                            continue; // Lewati baris kosong
-                        }
-
-                        if (!empty($value['B'])) {
-                            if (empty($value['A']) || !UserModel::find($value['A'])) {
-                                continue;
-                            }
-
-                            if (PenjualanModel::where('penjualan_kode', $value['B'])->exists()) {
-                                continue;
-                            }
-
-                            $tanggal = null;
-                            if (is_numeric($value['D'])) {
-                                $tanggal = Date::excelToDateTimeObject($value['D'])->format('Y-m-d');
-                            } else {
-                                try {
-                                    $tanggal = Carbon::createFromFormat('d/m/Y', $value['D'])->format('Y-m-d');
-                                } catch (\Exception $e) {
-                                    continue;
-                                }
-                            }
-
-                            if (empty($value['C'])) {
-                                continue;
-                            }
-
-                            $penjualan = [
-                                'user_id'           => $value['A'],
-                                'penjualan_kode'    => $value['B'],
-                                'pembeli'           => $value['C'],
-                                'penjualan_tanggal' => $tanggal,
-                                'created_at'        => now(),
-                                'updated_at'        => now(),
-                            ];
-
-                            $currentPenjualanKode = $value['B'];
-                            $penjualans[] = $penjualan;
-                        }
-
-                        if (!empty($value['E']) && !empty($value['F'])) {
-                            $barang = BarangModel::find($value['E']);
-                            if (!$barang) {
-                                continue;
-                            }
-
-                            if (!is_numeric($value['F']) || $value['F'] <= 0) {
-                                continue;
-                            }
-
-                            if (!$currentPenjualanKode) {
-                                continue;
-                            }
-
-                            $details[] = [
-                                'penjualan_kode' => $currentPenjualanKode, // Digunakan sementara untuk mencocokkan penjualan_id
-                                'barang_id'      => $value['E'],
-                                'harga'          => $barang->harga_jual,
-                                'jumlah'         => (int) $value['F'],
-                                'created_at'     => now(),
-                                'updated_at'     => now(),
-                            ];
-                        }
-                    }
-
-                    if (count($penjualans) > 0 || count($details) > 0) {
-                        DB::beginTransaction();
-                        try {
-                            if (count($penjualans) > 0) {
-                                PenjualanModel::insertOrIgnore($penjualans);
-                            }
-
-                            if (count($details) > 0) {
-                                $penjualanIds = PenjualanModel::whereIn('penjualan_kode', array_column($details, 'penjualan_kode'))
-                                    ->pluck('penjualan_id', 'penjualan_kode');
-
-                                $detailsToInsert = [];
-                                foreach ($details as $detail) {
-                                    if (isset($penjualanIds[$detail['penjualan_kode']])) {
-                                        $detailsToInsert[] = [
-                                            'penjualan_id' => $penjualanIds[$detail['penjualan_kode']],
-                                            'barang_id'    => $detail['barang_id'],
-                                            'harga'        => $detail['harga'],
-                                            'jumlah'       => $detail['jumlah'],
-                                            'created_at'   => $detail['created_at'],
-                                            'updated_at'   => $detail['updated_at'],
-                                        ];
-                                    }
-                                }
-
-                                if (count($detailsToInsert) > 0) {
-                                    DetailPenjualanModel::insertOrIgnore($detailsToInsert);
-                                }
-                            }
-
-                            DB::commit();
-                            return response()->json([
-                                'status' => true,
-                                'message' => 'Data berhasil diimport',
-                            ]);
-                        } catch (\Exception $e) {
-                            DB::rollBack();
-                            Log::error('Impor gagal: ' . $e->getMessage());
-                            return response()->json([
-                                'status' => false,
-                                'message' => 'Terjadi kesalahan saat mengimpor: ' . $e->getMessage(),
-                            ]);
-                        }
-                    }
-
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Tidak ada data yang valid untuk diimport',
-                    ]);
-                }
-            } catch (\Exception $e) {
-                Log::error('Impor gagal: ' . $e->getMessage());
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Terjadi kesalahan saat mengimpor: ' . $e->getMessage(),
-                ]);
-            }
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi Gagal',
+                'msgField' => $validator->errors(),
+            ]);
         }
 
-        return redirect('/');
+        try {
+            $file = $request->file('file_penjualan');
+            $reader = IOFactory::createReader('Xlsx');
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $data = $sheet->toArray(null, false, true, true);
+
+            $penjualans = [];
+            $details = [];
+            $currentPenjualanKode = null;
+
+            if (count($data) > 1) {
+                foreach ($data as $baris => $value) {
+                    if ($baris <= 1) {
+                        continue; // Lewati header
+                    }
+
+                    if (empty($value['B']) && empty($value['D']) && empty($value['E'])) {
+                        continue; // Lewati baris kosong
+                    }
+
+                    if (!empty($value['B'])) {
+                        if (empty($value['A']) || !UserModel::find($value['A'])) {
+                            continue;
+                        }
+
+                        if (PenjualanModel::where('penjualan_kode', $value['B'])->exists()) {
+                            continue;
+                        }
+
+                        if (empty($value['C'])) {
+                            continue;
+                        }
+
+                        $tanggal = now(); //SIMPAN dengan format Y-m-d H:i:s (default Laravel/MySQL)
+
+                        $penjualan = [
+                            'user_id'           => $value['A'],
+                            'penjualan_kode'    => $value['B'],
+                            'pembeli'           => $value['C'],
+                            'penjualan_tanggal' => $tanggal,
+                            'created_at'        => now(),
+                            'updated_at'        => now(),
+                        ];
+
+                        $currentPenjualanKode = $value['B'];
+                        $penjualans[] = $penjualan;
+                    }
+
+                    if (!empty($value['E']) && !empty($value['E'])) {
+                        $barang = BarangModel::find($value['D']);
+                        if (!$barang) {
+                            continue;
+                        }
+
+                        if (!is_numeric($value['E']) || $value['E'] <= 0) {
+                            continue;
+                        }
+
+                        if (!$currentPenjualanKode) {
+                            continue;
+                        }
+
+                        $details[] = [
+                            'penjualan_kode' => $currentPenjualanKode,
+                            'barang_id'      => $value['D'],
+                            'harga'          => $barang->harga_jual,
+                            'jumlah'         => (int) $value['E'],
+                            'created_at'     => now(),
+                            'updated_at'     => now(),
+                        ];
+                    }
+                }
+
+                if (count($penjualans) > 0 || count($details) > 0) {
+                    DB::beginTransaction();
+                    try {
+                        if (count($penjualans) > 0) {
+                            PenjualanModel::insertOrIgnore($penjualans);
+                        }
+
+                        if (count($details) > 0) {
+                            $penjualanIds = PenjualanModel::whereIn('penjualan_kode', array_column($details, 'penjualan_kode'))
+                                ->pluck('penjualan_id', 'penjualan_kode');
+
+                            $detailsToInsert = [];
+                            foreach ($details as $detail) {
+                                if (isset($penjualanIds[$detail['penjualan_kode']])) {
+                                    $detailsToInsert[] = [
+                                        'penjualan_id' => $penjualanIds[$detail['penjualan_kode']],
+                                        'barang_id'    => $detail['barang_id'],
+                                        'harga'        => $detail['harga'],
+                                        'jumlah'       => $detail['jumlah'],
+                                        'created_at'   => $detail['created_at'],
+                                        'updated_at'   => $detail['updated_at'],
+                                    ];
+                                }
+                            }
+
+                            if (count($detailsToInsert) > 0) {
+                                DetailPenjualanModel::insertOrIgnore($detailsToInsert);
+                            }
+                        }
+
+                        DB::commit();
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'Data berhasil diimport',
+                        ]);
+                    } catch (\Exception $e) {
+                        DB::rollBack();
+                        Log::error('Impor gagal: ' . $e->getMessage());
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Terjadi kesalahan saat mengimpor: ' . $e->getMessage(),
+                        ]);
+                    }
+                }
+
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Tidak ada data yang valid untuk diimport',
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Impor gagal: ' . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat mengimpor: ' . $e->getMessage(),
+            ]);
+        }
     }
+
+    return redirect('/');
+}
 
     public function export_excel()
     {

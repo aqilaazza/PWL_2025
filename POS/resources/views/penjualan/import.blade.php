@@ -56,7 +56,7 @@
                                 title: 'Berhasil',
                                 text: response.message
                             });
-                            tablePenjualan.ajax.reload(); // sesuaikan nama datatable
+                            tablePenjualan.ajax.reload();
                         } else {
                             $('.error-text').text('');
                             $.each(response.msgField, function(prefix, val) {

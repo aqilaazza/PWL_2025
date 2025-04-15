@@ -8,13 +8,15 @@
             font-family: "Times New Roman", Times, serif;
             margin: 6px 20px 5px 20px;
             line-height: 15px;
+            font-size: 9pt;
         }
         table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 9pt;
         }
         td, th {
-            padding: 4px 3px;
+            padding: 3px 6px;
         }
         th {
             text-align: left;
@@ -55,6 +57,9 @@
         .border-all, .border-all th, .border-all td {
             border: 1px solid;
         }
+        .total-row {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -93,17 +98,44 @@
                 <th>Kode Penjualan</th>
                 <th>Pembeli</th>
                 <th class="text-center">Tanggal</th>
+                <th>Barang</th>
+                <th class="text-center">Jumlah</th>
+                <th class="text-right">Harga</th>
+                <th class="text-right">Subtotal</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($penjualan as $p)
-                <tr>
-                    <td class="text-center">{{ $loop->iteration }}</td>
-                    <td>{{ $p->user->nama }}</td>
-                    <td>{{ $p->penjualan_kode }}</td>
-                    <td>{{ $p->pembeli }}</td>
-                    <td class="text-center">{{$p->penjualan_tanggal }}</td>
+            @php
+                $total_per_penjualan = 0;
+            @endphp
+            @foreach($penjualans as $p)
+                @php
+                    $total_penjualan = 0;
+                @endphp
+                @foreach($p->details as $detail)
+                    @php
+                        $subtotal = $detail->harga * $detail->jumlah;
+                        $total_penjualan += $subtotal;
+                    @endphp
+                    <tr>
+                        <td class="text-center">{{ $loop->parent->iteration }}</td>
+                        <td>{{ $p->user->nama }}</td>
+                        <td>{{ $p->penjualan_kode }}</td>
+                        <td>{{ $p->pembeli }}</td>
+                        <td class="text-center">{{ $p->penjualan_tanggal }}</td>
+                        <td>{{ $detail->barang->barang_nama ?? '-' }}</td>
+                        <td class="text-center">{{ $detail->jumlah }}</td>
+                        <td class="text-right">Rp {{ number_format($detail->harga, 0, ',', '.') }}</td>
+                        <td class="text-right">Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
+                    </tr>
+                @endforeach
+                <tr class="total-row">
+                    <td colspan="8" class="text-left">Total Penjualan</td>
+                    <td class="text-right">Rp {{ number_format($total_penjualan, 0, ',', '.') }}</td>
                 </tr>
+                @php
+                    $total_per_penjualan += $total_penjualan;
+                @endphp
             @endforeach
         </tbody>
     </table>
