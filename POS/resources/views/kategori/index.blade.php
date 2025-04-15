@@ -5,10 +5,20 @@
         <div class="card-header">
             <h3 class="card-title">Daftar Kategori</h3>
             <div class="card-tools">
-                <button onclick="modalAction('{{ url('/kategori/import') }}')" class="btn btn-info">Import Kategori</button>
-                <a href="{{ url('/kategori/export_excel') }}" class="btn btn-primary"><i class="fa fa-file- excel"></i> Export Kategori (Xlsx)</a>
-                <button onclick="modalAction('{{ url('/kategori/create_ajax') }}')" class="btn btn-success">Tambah Data</button>
-                <a href="{{ url('/kategori/export_pdf') }}" class="btn btn-warning"><i class="fa fa-file- pdf"></i> Export Kategori (Pdf)</a>
+                <div class="d-flex flex-wrap gap-2 mb-3" role="group" aria-label="Aksi Kategori">
+                    <button onclick="modalAction('{{ url('/kategori/import') }}')" class="btn btn-outline-info">
+                        <i class="fa fa-upload me-1"></i> Import Kategori
+                    </button>
+                    <a href="{{ url('/kategori/export_excel') }}" class="btn btn-outline-primary">
+                        <i class="fa fa-file-excel me-1"></i> Export Excel
+                    </a>
+                    <button onclick="modalAction('{{ url('/kategori/create_ajax') }}')" class="btn btn-outline-success">
+                        <i class="fa fa-plus-circle me-1"></i> Tambah Data
+                    </button>
+                    <a href="{{ url('/kategori/export_pdf') }}" class="btn btn-outline-warning text-dark">
+                        <i class="fa fa-file-pdf me-1"></i> Export PDF
+                    </a>
+                </div>
             </div>
         </div>
         
