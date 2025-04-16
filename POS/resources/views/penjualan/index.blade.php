@@ -154,15 +154,15 @@
                     processing: "Memuat data...",
                     emptyTable: "Tidak ada data transaksi.",
                     zeroRecords: "Tidak ada data yang sesuai dengan pencarian.",
-                    info: "Menampilkan START sampai END dari TOTAL entri",
+                    //info: "Menampilkan START sampai END dari TOTAL entri",
                     infoEmpty: "Menampilkan 0 sampai 0 dari 0 entri",
-                    lengthMenu: "Tampilkan MENU entri",
+                    //lengthMenu: "Tampilkan MENU entri",
                     search: "Cari:",
                     paginate: {
                         first: "Pertama",
                         last: "Terakhir",
-                        next: "Selanjutnya",
-                        previous: "Sebelumnya"
+                        next: "Next",
+                        previous: "Previous"
                     }
                 }
             });
