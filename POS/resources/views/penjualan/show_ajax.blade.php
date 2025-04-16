@@ -13,18 +13,24 @@
     </div>
 </div>
 @else
-<div class="modal-dialog modal-lg" role="document">
+<div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 350px;">
     <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title">Detail Penjualan</h5>
-            <button type="button" class="close" data-dismiss="modal">
-                <span>×</span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <h3 class="text-center">Struk Penjualan</h3>
-            
-            <div class="receipt">
+        <div class="modal-body px-3 py-2">
+
+            {{-- Cover Header --}}
+            <div class="text-center mb-2">
+                <img src="{{ asset('polinema-bw.png') }}" style="height: 60px; max-width: 100px;">
+                <div style="font-size: 9pt; font-weight: bold; margin-top: 4px;">KEMENTERIAN PENDIDIKAN, KEBUDAYAAN, RISET, DAN TEKNOLOGI</div>
+                <div style="font-size: 10pt; font-weight: bold;">POLITEKNIK NEGERI MALANG</div>
+                <div style="font-size: 8pt;">Jl. Soekarno-Hatta No. 9 Malang 65141</div>
+                <div style="font-size: 8pt;">Telp. (0341) 404424, Fax. (0341) 404420</div>
+                <div style="font-size: 8pt;">www.polinema.ac.id</div>
+            </div>
+
+            {{-- Garis Pembatas --}}
+            <hr style="border-top: 1px dashed #000; margin-top: 5px; margin-bottom: 10px;">
+
+            <div class="receipt" style="font-family: 'Courier New', Courier, monospace; font-size: 13px;">
                 <p><strong>Kode Penjualan:</strong> {{ $penjualan->penjualan_kode }}</p>
                 <p><strong>Petugas:</strong> {{ $penjualan->user->nama ?? '-' }}</p>
                 <p><strong>Pembeli:</strong> {{ $penjualan->pembeli }}</p>
