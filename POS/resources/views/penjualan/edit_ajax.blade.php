@@ -25,7 +25,8 @@
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label for="penjualan_kode">Kode Penjualan</label>
-                        <input type="text" name="penjualan_kode" class="form-control" value="{{ $penjualan->penjualan_kode }}">
+                        <input type="text" name="penjualan_kode" class="form-control" 
+                            value="{{ $penjualan->penjualan_kode }}" readonly>
                         <small id="error-penjualan_kode" class="text-danger"></small>
                     </div>
                     <div class="form-group col-md-6">
@@ -47,8 +48,8 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="penjualan_tanggal">Tanggal Penjualan</label>
-                        <input type="date" name="penjualan_tanggal" class="form-control"
-                            value="{{ \Carbon\Carbon::parse($penjualan->penjualan_tanggal)->format('Y-m-d') }}">
+                        <input type="date" name="penjualan_tanggal" class="form-control" 
+                            value="{{ \Carbon\Carbon::parse($penjualan->penjualan_tanggal)->format('Y-m-d') }}" readonly>
                         <small id="error-penjualan_tanggal" class="text-danger"></small>
                     </div>
                 </div>
