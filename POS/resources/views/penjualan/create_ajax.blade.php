@@ -13,8 +13,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label><strong>Kode Penjualan</strong></label>
-                        <input type="text" name="penjualan_kode" class="form-control" value="TRX00" required>
-                        <small class="form-text text-muted">Format: TRX00(ANGKA), contoh: TRX001</small>
+                        <input type="text" name="penjualan_kode" class="form-control" value="{{ $kodeBaru }}" readonly required>
                         <small id="error-penjualan_kode" class="text-danger"></small>
                     </div>
                     <div class="col-md-6 mb-3">
@@ -89,6 +88,9 @@
 
 <script>
     $(document).ready(function() {
+        // Pastikan input penjualan_kode readonly
+        $('input[name="penjualan_kode"]').prop('readonly', true);
+
         // Tambah baris barang
         $('#addRow').click(function() {
             let row = `

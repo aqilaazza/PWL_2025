@@ -88,10 +88,25 @@ class PenjualanController extends Controller
     public function create_ajax()
     {
         $user = UserModel::all();
-        $barangs = BarangModel::all(); // Ambil data barang untuk form
-        return view('penjualan.create_ajax', compact('user', 'barangs'));
+        $barangs = BarangModel::all();
+
+        // Ambil kode terakhir dari database
+        $lastKode = DB::table('t_penjualan')
+            ->orderBy('penjualan_id', 'desc')
+            ->value('penjualan_kode');
+
+        if ($lastKode && preg_match('/TRX(\d+)/', $lastKode, $match)) {
+            $number = (int) $match[1] + 1;
+        } else {
+            $number = 1;
+        }
+
+        $kodeBaru = 'TRX' . str_pad($number, 3, '0', STR_PAD_LEFT);
+
+        return view('penjualan.create_ajax', compact('user', 'barangs', 'kodeBaru'));
     }
 
+    
     // Menyimpan data penjualan baru dgn ajax
     public function store_ajax(Request $request)
     {
@@ -106,9 +121,9 @@ class PenjualanController extends Controller
                 'jumlah'            => 'required|array',
                 'jumlah.*'          => 'required|integer|min:1',
             ];
-
+    
             $validator = Validator::make($request->all(), $rules);
-
+    
             if ($validator->fails()) {
                 return response()->json([
                     'status' => false,
@@ -116,55 +131,82 @@ class PenjualanController extends Controller
                     'msgField' => $validator->errors(),
                 ]);
             }
-
+    
             try {
                 // Gunakan transaksi database untuk memastikan konsistensi
                 return DB::transaction(function () use ($request) {
+                    // Generate kode penjualan baru dengan format TRXxxxx
+                    // Generate kode penjualan baru dengan format TRXxxxx
+
+                   // Mengambil kode penjualan terakhir berdasarkan penjualan_id terbesar
+                    $lastKode = DB::table('t_penjualan')
+                    ->orderByDesc('penjualan_id') // Urutkan berdasarkan penjualan_id, yang pasti lebih besar di urutan terakhir
+                    ->value('penjualan_kode');
+
+                    // Logika untuk menghasilkan kode penjualan berikutnya
+                    if ($lastKode) {
+                    // Ekstrak angka terakhir dari kode penjualan, misalnya TRX020 -> 20
+                    if (preg_match('/TRX(\d+)/', $lastKode, $match)) {
+                        $number = (int) $match[1] + 1; // Menambahkan 1 pada angka terakhir
+                    } else {
+                        $number = 1; // Jika format kode tidak sesuai, mulai dari 1
+                    }
+                    } else {
+                    $number = 1; // Jika tidak ada penjualan sebelumnya, mulai dari 1
+                    }
+
+                    // Membuat kode penjualan baru dengan format TRX + 4 digit angka
+                    $kodeBaru = 'TRX' . str_pad($number, 4, '0', STR_PAD_LEFT); // Format dengan 4 digit angka, misalnya TRX0001
+
+    
                     // Simpan header transaksi
                     $penjualan = new PenjualanModel();
-                    $penjualan->penjualan_kode = $request->penjualan_kode;
+                    $penjualan->penjualan_kode = $kodeBaru;
                     $penjualan->pembeli = $request->pembeli;
                     $penjualan->penjualan_tanggal = $request->penjualan_tanggal;
                     $penjualan->user_id = $request->user_id;
                     $penjualan->save();
-
+    
                     // Simpan detail transaksi dan validasi stok
                     foreach ($request->barang_id as $index => $barang_id) {
                         $barang = BarangModel::find($barang_id);
                         $stok = StokModel::where('barang_id', $barang_id)->first();
-
+    
                         // Validasi stok
                         if (!$stok || $stok->stok_jumlah < $request->jumlah[$index]) {
                             throw new \Exception("Stok barang {$barang->barang_nama} tidak cukup!");
                         }
-
-                        // Simpan detail
+    
+                        // Simpan detail transaksi
                         $detail = new DetailPenjualanModel();
                         $detail->penjualan_id = $penjualan->penjualan_id;
                         $detail->barang_id = $barang_id;
                         $detail->harga = $barang->harga_jual;
                         $detail->jumlah = $request->jumlah[$index];
                         $detail->save();
-
+    
                         // Kurangi stok
                         $stok->stok_jumlah -= $request->jumlah[$index];
                         $stok->save();
                     }
-
+    
+                    // Mengirimkan respon sukses setelah transaksi berhasil
                     return response()->json([
                         'status' => true,
                         'message' => 'Data penjualan berhasil disimpan',
                     ]);
                 });
             } catch (\Exception $e) {
+                // Menangani exception jika terjadi kesalahan
                 return response()->json([
                     'status' => false,
                     'message' => 'Gagal menyimpan data: ' . $e->getMessage(),
                 ]);
             }
+    
         }
         return redirect('/');
-    }
+    }    
     
 
 // Mengedit data penjualan dgn ajax
