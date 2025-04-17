@@ -107,7 +107,8 @@ class BarangController extends Controller
     public function edit_ajax($id){
         $barang = BarangModel::find($id);
         $level = LevelModel::select('level_id', 'level_nama')->get();
-        return view('barang.edit_ajax', ['barang' => $barang, 'level' => $level]);
+        $kategori = KategoriModel::select('kategori_id', 'kategori_nama')->get();
+        return view('barang.edit_ajax', ['barang' => $barang, 'level' => $level, 'kategori' => $kategori]);
     }
 
     //Menampilkan detail
