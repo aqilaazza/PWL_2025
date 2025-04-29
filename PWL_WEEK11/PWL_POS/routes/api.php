@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\BarangController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\LogoutController;
+use App\Http\Controllers\Api\PenjualanController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -58,4 +59,13 @@ Route::post('/barangs', [BarangController::class, 'store']);
 Route::get('/barangs/{barang}', [BarangController::class, 'show']);
 Route::put('/barangs/{barang}', [BarangController::class, 'update']);
 Route::delete('/barangs/{barang}', [BarangController::class, 'destroy']);
+
+// Route Transaksi
+Route::get('transaksi', [PenjualanController::class, 'index']);
+Route::get('transaksi/{transaksi}', [PenjualanController::class, 'show']);
+Route::post('transaksi', [PenjualanController::class, 'store']);
+Route::post('transaksi/{transaksi}', [PenjualanController::class, 'update']);
+Route::delete('transaksi/{transaksi}', [PenjualanController::class, 'destroy']);
+
+
 
